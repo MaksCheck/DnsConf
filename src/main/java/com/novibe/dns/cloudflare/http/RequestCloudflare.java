@@ -1,6 +1,7 @@
 package com.novibe.dns.cloudflare.http;
 
 import com.novibe.common.HttpRequestSender;
+import com.novibe.common.exception.DnsHttpError;
 import com.novibe.common.exception.ProcessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,4 +38,10 @@ public class RequestCloudflare extends HttpRequestSender {
                 1) Zero Trust:Edit
                 2) Account Firewall Access Rules:Edit""");
     }
+
+    @Override
+    protected void react404(DnsHttpError httpError) {
+        throw httpError;
+    }
+
 }

@@ -32,8 +32,8 @@ public abstract class HttpRequestSender {
     protected abstract String authHeaderValue();
 
     protected abstract void react401();
-
     protected abstract void react403();
+    protected abstract void react404(DnsHttpError dnsHttpError);
 
     @Setter(onMethod_ = @Autowired)
     protected HttpClient httpClient;
@@ -77,13 +77,11 @@ public abstract class HttpRequestSender {
         if (response.statusCode() > 299) {
             DnsHttpError httpError = new DnsHttpError(response, body);
             Log.fail(httpError.getMessage());
-            if (response.statusCode() == 401) {
-                react401();
-            }
-            if (response.statusCode() == 403) {
-                react403();
-            } else {
-                throw httpError;
+            switch (response.statusCode()) {
+                case 401 -> react401();
+                case 403 -> react403();
+                case 404 -> react404(httpError);
+                default -> throw httpError;
             }
         }
         if (response.body().isEmpty()) {
